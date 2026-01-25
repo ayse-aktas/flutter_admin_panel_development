@@ -1,6 +1,11 @@
-import 'package:flutter_admin_panel_development/utils/theme.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_admin_panel_development/services/auth_service.dart';
+import 'package:flutter_admin_panel_development/services/database_service.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
   runApp(const MyApp());
 }
 
@@ -9,11 +14,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Admin Panel',
-      debugShowCheckedModeBanner: false,
-      theme: AppTheme.lightTheme,
-      home: HomePage(),
+    return MultiProvider(
+      providers: [
+        Provider<AuthService>(create: (_) => AuthService()),
+        Provider<DatabaseService>(create: (_) => DatabaseService()),
+      ],
+      child: MaterialApp(
+        title: 'Admin Panel',
+        debugShowCheckedModeBanner: false,
+        theme: AppTheme.lightTheme,
+        home: const HomePage(), // Temporary, will change to AuthWrapper or AdminDashboard
+      ),
     );
   }
 }
