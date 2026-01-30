@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin_panel_development/screens/home_page/home_page.dart';
+import 'package:flutter_admin_panel_development/screens/admin/admin_dashboard.dart';
 import 'package:flutter_admin_panel_development/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
@@ -26,7 +26,7 @@ class MyApp extends StatelessWidget {
         title: 'Admin Panel',
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
-        home: const HomePage(),
+        home: const AdminDashboard(),
       ),
     );
   }
