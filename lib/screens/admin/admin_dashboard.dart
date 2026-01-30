@@ -4,6 +4,8 @@ import 'package:flutter_admin_panel_development/services/database_service.dart';
 import 'package:flutter_admin_panel_development/models/admin_stats_model.dart';
 import 'package:flutter_admin_panel_development/screens/admin/widgets/dashboard_card.dart';
 import 'package:flutter_admin_panel_development/utils/constants.dart';
+import 'package:flutter_admin_panel_development/screens/admin/product_list_screen.dart';
+import 'package:flutter_admin_panel_development/screens/admin/category_list_screen.dart';
 
 class AdminDashboard extends StatelessWidget {
   const AdminDashboard({super.key});
@@ -13,9 +15,7 @@ class AdminDashboard extends StatelessWidget {
     final databaseService = Provider.of<DatabaseService>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Admin Dashboard'),
-      ),
+      appBar: AppBar(title: const Text('Admin Dashboard')),
       body: StreamBuilder<AdminStatsModel>(
         stream: databaseService.getAdminStats(),
         builder: (context, snapshot) {
@@ -27,9 +27,15 @@ class AdminDashboard extends StatelessWidget {
             return Center(child: Text('Error: ${snapshot.error}'));
           }
 
-          final stats = snapshot.data ?? AdminStatsModel(
-            earning: 0, pendingOrder: 0, deliveryOrder: 0, cancelOrder: 0, completedOrder: 0
-          );
+          final stats =
+              snapshot.data ??
+              AdminStatsModel(
+                earning: 0,
+                pendingOrder: 0,
+                deliveryOrder: 0,
+                cancelOrder: 0,
+                completedOrder: 0,
+              );
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
@@ -40,7 +46,8 @@ class AdminDashboard extends StatelessWidget {
               children: [
                 DashboardCard(
                   title: 'Total Earning',
-                  value: '${AppConstants.currencySymbol}${stats.earning.toStringAsFixed(2)}',
+                  value:
+                      '${AppConstants.currencySymbol}${stats.earning.toStringAsFixed(2)}',
                   icon: Icons.attach_money,
                   color: Colors.green.shade700,
                   onTap: () {},
@@ -66,7 +73,7 @@ class AdminDashboard extends StatelessWidget {
                   color: Colors.red,
                   onTap: () {}, // TODO: Navigate to Cancelled Orders
                 ),
-               DashboardCard(
+                DashboardCard(
                   title: 'Completed Orders',
                   value: stats.completedOrder.toString(),
                   icon: Icons.check_circle,
@@ -78,16 +85,30 @@ class AdminDashboard extends StatelessWidget {
                   value: stats.products.toString(),
                   icon: Icons.inventory_2,
                   color: Colors.purple,
-                  onTap: () {}, // TODO: Navigate to Products
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const ProductListScreen(),
+                      ),
+                    );
+                  },
                 ),
-                 DashboardCard(
+                DashboardCard(
                   title: 'Categories',
                   value: stats.categories.toString(),
                   icon: Icons.category,
                   color: Colors.indigo,
-                  onTap: () {}, // TODO: Navigate to Categories
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const CategoryListScreen(),
+                      ),
+                    );
+                  },
                 ),
-                 DashboardCard(
+                DashboardCard(
                   title: 'Users',
                   value: stats.users.toString(),
                   icon: Icons.people,

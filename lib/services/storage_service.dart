@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_admin_panel_development/utils/constants.dart';
@@ -22,11 +23,11 @@ class StorageService {
         final jsonMap = jsonDecode(responseString);
         return jsonMap['secure_url']; // Returns the image URL
       } else {
-        print('Cloudinary upload failed: ${response.statusCode}');
+        debugPrint('Cloudinary upload failed: ${response.statusCode}');
         return null;
       }
     } catch (e) {
-      print('Error uploading image to Cloudinary: $e');
+      debugPrint('Error uploading image to Cloudinary: $e');
       return null;
     }
   }

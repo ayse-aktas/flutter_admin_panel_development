@@ -8,7 +8,11 @@ import 'package:flutter_admin_panel_development/services/database_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  try {
+    await Firebase.initializeApp();
+  } catch (e) {
+    debugPrint('FIREBASE INIT ERROR: $e');
+  }
   runApp(const MyApp());
 }
 

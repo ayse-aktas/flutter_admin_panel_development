@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 
 class AppTheme {
   // Green Theme Colors
-  static const Color primaryColor = Color(0xFF2E7D32); // A nice professional green
+  static const Color primaryColor = Color(
+    0xFF2E7D32,
+  ); // A nice professional green
   static const Color secondaryColor = Color(0xFF66BB6A);
   static const Color accentColor = Color(0xFF1B5E20);
-  
+
   static const Color backgroundColor = Color(0xFFF5F5F5);
   static const Color surfaceColor = Colors.white;
   static const Color errorColor = Color(0xFFD32F2F);
@@ -21,11 +23,10 @@ class AppTheme {
       primary: primaryColor,
       secondary: secondaryColor,
       surface: surfaceColor,
-      background: backgroundColor,
       error: errorColor,
     ),
     scaffoldBackgroundColor: backgroundColor,
-    
+
     // AppBar Theme
     appBarTheme: const AppBarTheme(
       backgroundColor: primaryColor,
@@ -40,12 +41,10 @@ class AppTheme {
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
       ),
     ),
-    
+
     // Input Decoration Theme
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
