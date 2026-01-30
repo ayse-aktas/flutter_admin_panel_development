@@ -6,16 +6,62 @@ import 'package:flutter_admin_panel_development/screens/admin/widgets/dashboard_
 import 'package:flutter_admin_panel_development/utils/constants.dart';
 import 'package:flutter_admin_panel_development/screens/admin/product_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/category_list_screen.dart';
+import 'package:flutter_admin_panel_development/screens/admin/order_list_screen.dart';
 
-class AdminDashboard extends StatelessWidget {
+class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
+
+  @override
+  State<AdminDashboard> createState() => _AdminDashboardState();
+}
+
+class _AdminDashboardState extends State<AdminDashboard> {
+  @override
+  void initState() {
+    super.initState();
+    // Dashboard açıldığında verilerin güncel olduğundan emin olmak için hesaplama yap
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initStats();
+    });
+  }
+
+  Future<void> _initStats() async {
+    try {
+      if (!mounted) return;
+      final db = Provider.of<DatabaseService>(context, listen: false);
+      // RecalculateStats mevcut "stats" dokümanını collections'dan sayarak günceller
+      await db.recalculateStats();
+    } catch (e) {
+      debugPrint('Stats sync error: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final databaseService = Provider.of<DatabaseService>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Admin Dashboard')),
+      appBar: AppBar(
+        title: const Text('Admin Dashboard'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            tooltip: 'Recalculate Stats',
+            onPressed: () async {
+              final db = Provider.of<DatabaseService>(context, listen: false);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('Recalculating stats...')),
+              );
+              await db.recalculateStats();
+              if (context.mounted) {
+                ScaffoldMessenger.of(
+                  context,
+                ).showSnackBar(const SnackBar(content: Text('Stats updated!')));
+              }
+            },
+          ),
+        ],
+      ),
       body: StreamBuilder<AdminStatsModel>(
         stream: databaseService.getAdminStats(),
         builder: (context, snapshot) {
@@ -57,28 +103,56 @@ class AdminDashboard extends StatelessWidget {
                   value: stats.pendingOrder.toString(),
                   icon: Icons.pending_actions,
                   color: Colors.orange,
-                  onTap: () {}, // TODO: Navigate to Pending Orders
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OrderListScreen(),
+                      ),
+                    ).then((_) => _initStats());
+                  },
                 ),
                 DashboardCard(
                   title: 'Delivery Orders',
                   value: stats.deliveryOrder.toString(),
                   icon: Icons.local_shipping,
                   color: Colors.blue,
-                  onTap: () {}, // TODO: Navigate to Delivery Orders
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OrderListScreen(),
+                      ),
+                    ).then((_) => _initStats());
+                  },
                 ),
                 DashboardCard(
                   title: 'Cancelled Orders',
                   value: stats.cancelOrder.toString(),
                   icon: Icons.cancel,
                   color: Colors.red,
-                  onTap: () {}, // TODO: Navigate to Cancelled Orders
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OrderListScreen(),
+                      ),
+                    ).then((_) => _initStats());
+                  },
                 ),
                 DashboardCard(
                   title: 'Completed Orders',
                   value: stats.completedOrder.toString(),
                   icon: Icons.check_circle,
                   color: Colors.teal,
-                  onTap: () {}, // TODO: Navigate to Completed Orders
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const OrderListScreen(),
+                      ),
+                    ).then((_) => _initStats());
+                  },
                 ),
                 DashboardCard(
                   title: 'Products',
@@ -91,7 +165,7 @@ class AdminDashboard extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => const ProductListScreen(),
                       ),
-                    );
+                    ).then((_) => _initStats());
                   },
                 ),
                 DashboardCard(
@@ -105,7 +179,7 @@ class AdminDashboard extends StatelessWidget {
                       MaterialPageRoute(
                         builder: (_) => const CategoryListScreen(),
                       ),
-                    );
+                    ).then((_) => _initStats());
                   },
                 ),
                 DashboardCard(

@@ -3,7 +3,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 class OrderModel {
   final String orderId;
   final String userId;
-  final List<Map<String, dynamic>> products; // Stores productId, quantity, price
+  final String userName;
+  final List<Map<String, dynamic>>
+  products; // Stores productId, quantity, price
   final double totalPrice;
   final String paymentMethod;
   final String status; // pending, cancelled, delivered, completed
@@ -12,6 +14,7 @@ class OrderModel {
   OrderModel({
     required this.orderId,
     required this.userId,
+    this.userName = 'Guest',
     required this.products,
     required this.totalPrice,
     required this.paymentMethod,
@@ -23,6 +26,7 @@ class OrderModel {
     return OrderModel(
       orderId: documentId,
       userId: data['userId'] ?? '',
+      userName: data['userName'] ?? 'Guest',
       products: List<Map<String, dynamic>>.from(data['products'] ?? []),
       totalPrice: (data['totalPrice'] as num?)?.toDouble() ?? 0.0,
       paymentMethod: data['paymentMethod'] ?? '',
@@ -35,6 +39,7 @@ class OrderModel {
     return {
       'orderId': orderId,
       'userId': userId,
+      'userName': userName,
       'products': products,
       'totalPrice': totalPrice,
       'paymentMethod': paymentMethod,

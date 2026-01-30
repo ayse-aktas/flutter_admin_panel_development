@@ -20,15 +20,44 @@ class DatabaseService {
         });
   }
 
-  Future<void> addCategory(String name) async {
-    await _firestore.collection('categories').add({
+  Future<void> addCategory(String name, {String? imageUrl}) async {
+    WriteBatch batch = _firestore.batch();
+    DocumentReference newCategoryRef = _firestore
+        .collection('categories')
+        .doc();
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    batch.set(newCategoryRef, {
       'name': name,
+      'imageUrl': imageUrl,
       'createdAt': FieldValue.serverTimestamp(),
     });
+
+    // Use set with merge to ensure stats doc exists and update atomically
+    batch.set(statsRef, {
+      'categories': FieldValue.increment(1),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
   }
 
   Future<void> deleteCategory(String categoryId) async {
-    await _firestore.collection('categories').doc(categoryId).delete();
+    WriteBatch batch = _firestore.batch();
+    DocumentReference categoryRef = _firestore
+        .collection('categories')
+        .doc(categoryId);
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    batch.delete(categoryRef);
+    batch.set(statsRef, {
+      'categories': FieldValue.increment(-1),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
   }
 
   // --- Products ---
@@ -57,11 +86,24 @@ class DatabaseService {
   }
 
   Future<void> addProduct(ProductModel product) async {
-    await _firestore.collection('products').add({
+    WriteBatch batch = _firestore.batch();
+    DocumentReference newProductRef = _firestore
+        .collection('products')
+        .doc(); // Auto-id
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    batch.set(newProductRef, {
       ...product.toMap(),
-      'createdAt':
-          FieldValue.serverTimestamp(), // Override with server timestamp
+      'createdAt': FieldValue.serverTimestamp(),
     });
+
+    batch.set(statsRef, {
+      'products': FieldValue.increment(1),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
   }
 
   Future<void> updateProduct(ProductModel product) async {
@@ -72,7 +114,20 @@ class DatabaseService {
   }
 
   Future<void> deleteProduct(String productId) async {
-    await _firestore.collection('products').doc(productId).delete();
+    WriteBatch batch = _firestore.batch();
+    DocumentReference productRef = _firestore
+        .collection('products')
+        .doc(productId);
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    batch.delete(productRef);
+    batch.set(statsRef, {
+      'products': FieldValue.increment(-1),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
   }
 
   // --- Orders ---
@@ -159,6 +214,63 @@ class DatabaseService {
           completedOrder: 0,
         );
       }
+    });
+  }
+
+  // --- Maintenance ---
+  Future<void> recalculateStats() async {
+    final productSnap = await _firestore.collection('products').count().get();
+    final categorySnap = await _firestore
+        .collection('categories')
+        .count()
+        .get();
+    final userSnap = await _firestore
+        .collection('users')
+        .count()
+        .get(); // Assuming users collection exists
+
+    // For orders, we need to query based on status to get accurate counts
+    // Using count() is cheaper than get() documents if we just need size
+    final pendingSnap = await _firestore
+        .collection('orders')
+        .where('status', isEqualTo: 'pending')
+        .count()
+        .get();
+    final deliverySnap = await _firestore
+        .collection('orders')
+        .where('status', isEqualTo: 'delivery')
+        .count()
+        .get();
+    final cancelSnap = await _firestore
+        .collection('orders')
+        .where('status', isEqualTo: 'cancelled')
+        .count()
+        .get();
+    final completedSnap = await _firestore
+        .collection('orders')
+        .where('status', isEqualTo: 'completed')
+        .count()
+        .get();
+
+    // Calculate earnings manually as we need to sum values
+    final completedOrders = await _firestore
+        .collection('orders')
+        .where('status', isEqualTo: 'completed')
+        .get();
+    double totalEarning = 0;
+    for (var doc in completedOrders.docs) {
+      totalEarning += (doc.data()['totalPrice'] as num?)?.toDouble() ?? 0.0;
+    }
+
+    await _firestore.collection('admin_stats').doc('stats').set({
+      'products': productSnap.count,
+      'categories': categorySnap.count,
+      'users': userSnap.count,
+      'pendingOrder': pendingSnap.count,
+      'deliveryOrder': deliverySnap.count,
+      'cancelOrder': cancelSnap.count,
+      'completedOrder': completedSnap.count,
+      'earning': totalEarning,
     });
   }
 }

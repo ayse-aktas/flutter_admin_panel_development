@@ -22,13 +22,25 @@ class AdminStatsModel {
   factory AdminStatsModel.fromMap(Map<String, dynamic> data) {
     return AdminStatsModel(
       earning: (data['earning'] as num?)?.toDouble() ?? 0.0,
-      pendingOrder: (data['pendingOrder'] as num?)?.toInt() ?? 0,
-      deliveryOrder: (data['deliveryOrder'] as num?)?.toInt() ?? 0,
-      cancelOrder: (data['cancelOrder'] as num?)?.toInt() ?? 0,
-      completedOrder: (data['completedOrder'] as num?)?.toInt() ?? 0,
-      products: (data['products'] as num?)?.toInt() ?? 0,
-      users: (data['users'] as num?)?.toInt() ?? 0,
-      categories: (data['categories'] as num?)?.toInt() ?? 0,
+      pendingOrder: ((data['pendingOrder'] as num?)?.toInt() ?? 0).clamp(
+        0,
+        999999,
+      ),
+      deliveryOrder: ((data['deliveryOrder'] as num?)?.toInt() ?? 0).clamp(
+        0,
+        999999,
+      ),
+      cancelOrder: ((data['cancelOrder'] as num?)?.toInt() ?? 0).clamp(
+        0,
+        999999,
+      ),
+      completedOrder: ((data['completedOrder'] as num?)?.toInt() ?? 0).clamp(
+        0,
+        999999,
+      ),
+      products: ((data['products'] as num?)?.toInt() ?? 0).clamp(0, 999999),
+      users: ((data['users'] as num?)?.toInt() ?? 0).clamp(0, 999999),
+      categories: ((data['categories'] as num?)?.toInt() ?? 0).clamp(0, 999999),
     );
   }
 
