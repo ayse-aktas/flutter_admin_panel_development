@@ -18,10 +18,11 @@ class CategoryListScreen extends StatefulWidget {
 class _CategoryListScreenState extends State<CategoryListScreen> {
   final StorageService _storageService = StorageService();
 
-  void _showAddCategoryDialog(BuildContext context) {
-    final nameController = TextEditingController();
+  void _showCategoryDialog(BuildContext context, {CategoryModel? category}) {
+    final nameController = TextEditingController(text: category?.name ?? '');
     File? selectedImage;
     bool isUploading = false;
+    String? currentImageUrl = category?.imageUrl;
 
     showDialog(
       context: context,
@@ -29,7 +30,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
       builder: (ctx) => StatefulBuilder(
         builder: (context, setState) {
           return AlertDialog(
-            title: const Text('Add Category'),
+            title: Text(category == null ? 'Add Category' : 'Edit Category'),
             content: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
@@ -66,20 +67,28 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                               fit: BoxFit.cover,
                             ),
                           )
-                        : const Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(
-                                Icons.add_photo_alternate,
-                                size: 40,
-                                color: Colors.grey,
-                              ),
-                              Text(
-                                'Tap to add image (Optional)',
-                                style: TextStyle(color: Colors.grey),
-                              ),
-                            ],
-                          ),
+                        : (currentImageUrl != null
+                              ? ClipRRect(
+                                  borderRadius: BorderRadius.circular(8),
+                                  child: Image.network(
+                                    currentImageUrl,
+                                    fit: BoxFit.cover,
+                                  ),
+                                )
+                              : const Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.add_photo_alternate,
+                                      size: 40,
+                                      color: Colors.grey,
+                                    ),
+                                    Text(
+                                      'Tap to add image (Optional)',
+                                      style: TextStyle(color: Colors.grey),
+                                    ),
+                                  ],
+                                )),
                   ),
                 ),
                 if (isUploading) ...[
@@ -101,7 +110,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                         if (nameController.text.isNotEmpty) {
                           setState(() => isUploading = true);
 
-                          String? imageUrl;
+                          String? imageUrl = currentImageUrl;
                           if (selectedImage != null) {
                             imageUrl = await _storageService.uploadImage(
                               selectedImage!,
@@ -109,20 +118,27 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                           }
 
                           if (context.mounted) {
-                            // Ensure the widget is still mounted before using context
                             final db = Provider.of<DatabaseService>(
                               context,
                               listen: false,
                             );
-                            await db.addCategory(
-                              nameController.text.trim(),
-                              imageUrl: imageUrl,
-                            );
+                            if (category == null) {
+                              await db.addCategory(
+                                nameController.text.trim(),
+                                imageUrl: imageUrl,
+                              );
+                            } else {
+                              await db.updateCategory(
+                                category.categoryId,
+                                nameController.text.trim(),
+                                imageUrl,
+                              );
+                            }
                             if (ctx.mounted) Navigator.pop(ctx);
                           }
                         }
                       },
-                child: const Text('Add'),
+                child: Text(category == null ? 'Add' : 'Update'),
               ),
             ],
           );
@@ -141,7 +157,7 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.add),
-            onPressed: () => _showAddCategoryDialog(context),
+            onPressed: () => _showCategoryDialog(context),
           ),
         ],
       ),
@@ -172,11 +188,23 @@ class _CategoryListScreenState extends State<CategoryListScreen> {
                 subtitle: Text(
                   'Created: ${DateFormat('dd MMM yyyy').format(category.createdAt)}',
                 ),
-                trailing: IconButton(
-                  icon: const Icon(Icons.delete, color: Colors.red),
-                  onPressed: () async {
-                    await databaseService.deleteCategory(category.categoryId);
-                  },
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () =>
+                          _showCategoryDialog(context, category: category),
+                    ),
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () async {
+                        await databaseService.deleteCategory(
+                          category.categoryId,
+                        );
+                      },
+                    ),
+                  ],
                 ),
               );
             },

@@ -43,6 +43,17 @@ class DatabaseService {
     await batch.commit();
   }
 
+  Future<void> updateCategory(
+    String categoryId,
+    String name,
+    String? imageUrl,
+  ) async {
+    await _firestore.collection('categories').doc(categoryId).update({
+      'name': name,
+      'imageUrl': imageUrl,
+    });
+  }
+
   Future<void> deleteCategory(String categoryId) async {
     WriteBatch batch = _firestore.batch();
     DocumentReference categoryRef = _firestore
