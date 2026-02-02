@@ -5,6 +5,7 @@ import 'package:flutter_admin_panel_development/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
+import 'package:flutter_admin_panel_development/services/storage_service.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<AuthService>(create: (_) => AuthService()),
         Provider<DatabaseService>(create: (_) => DatabaseService()),
+        Provider<StorageService>(create: (_) => StorageService()),
       ],
       child: MaterialApp(
         title: 'Admin Panel',
