@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/screens/user/cart_screen.dart';
 import 'package:flutter_admin_panel_development/screens/user/profile_screen.dart';
+import 'package:flutter_admin_panel_development/screens/user/my_orders_screen.dart';
 import 'package:flutter_admin_panel_development/screens/user/user_home_screen.dart';
 import 'package:flutter_admin_panel_development/utils/theme.dart';
 
@@ -17,6 +18,7 @@ class _UserMainScreenState extends State<UserMainScreen> {
   final List<Widget> _pages = [
     const UserHomeScreen(),
     const CartScreen(),
+    const MyOrdersScreen(),
     const ProfileScreen(),
   ];
 
@@ -39,6 +41,10 @@ class _UserMainScreenState extends State<UserMainScreen> {
           BottomNavigationBarItem(
             icon: Icon(Icons.shopping_cart),
             label: 'Cart',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_bag),
+            label: 'Orders',
           ),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
