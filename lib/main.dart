@@ -1,6 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_admin_panel_development/screens/user/user_main_screen.dart';
+import 'package:flutter_admin_panel_development/screens/auth/auth_wrapper.dart';
 import 'package:flutter_admin_panel_development/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
@@ -33,7 +33,7 @@ class MyApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         theme: AppTheme.lightTheme,
         // home: const AdminDashboard(),
-        home: const UserMainScreen(),
+        home: const AuthWrapper(),
       ),
     );
   }

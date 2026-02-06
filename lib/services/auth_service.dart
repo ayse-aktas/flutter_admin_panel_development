@@ -12,20 +12,29 @@ class AuthService {
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
   // Sign Up
-  Future<String?> signUp({required String email, required String password, required String name}) async {
+  Future<String?> signUp({
+    required String email,
+    required String password,
+    required String name,
+    String role = 'user', // Default is user
+  }) async {
     try {
-      UserCredential result = await _auth.createUserWithEmailAndPassword(email: email, password: password);
+      UserCredential result = await _auth.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
       User? user = result.user;
-      
+
       if (user != null) {
         // Create user in Firestore
         UserModel newUser = UserModel(
           uid: user.uid,
           name: name,
           email: email,
+          role: role,
           createdAt: DateTime.now(),
         );
-        
+
         await _firestore.collection('users').doc(user.uid).set(newUser.toMap());
         return null; // Success
       }
@@ -38,7 +47,10 @@ class AuthService {
   }
 
   // Sign In
-  Future<String?> signIn({required String email, required String password}) async {
+  Future<String?> signIn({
+    required String email,
+    required String password,
+  }) async {
     try {
       await _auth.signInWithEmailAndPassword(email: email, password: password);
       return null; // Success
@@ -46,6 +58,22 @@ class AuthService {
       return e.message;
     } catch (e) {
       return e.toString();
+    }
+  }
+
+  // Get User Role
+  Future<String> getUserRole(String uid) async {
+    try {
+      DocumentSnapshot doc = await _firestore
+          .collection('users')
+          .doc(uid)
+          .get();
+      if (doc.exists && doc.data() != null) {
+        return doc.get('role') ?? 'user';
+      }
+      return 'user';
+    } catch (e) {
+      return 'user';
     }
   }
 

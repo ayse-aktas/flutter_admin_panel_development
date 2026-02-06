@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/screens/user/cart_screen.dart';
+import 'package:flutter_admin_panel_development/screens/user/profile_screen.dart';
 import 'package:flutter_admin_panel_development/screens/user/user_home_screen.dart';
 import 'package:flutter_admin_panel_development/utils/theme.dart';
 
@@ -16,7 +17,7 @@ class _UserMainScreenState extends State<UserMainScreen> {
   final List<Widget> _pages = [
     const UserHomeScreen(),
     const CartScreen(),
-    const Center(child: Text('Profile Screen Placeholder')),
+    const ProfileScreen(),
   ];
 
   @override
