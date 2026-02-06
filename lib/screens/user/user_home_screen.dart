@@ -4,6 +4,7 @@ import 'package:flutter_admin_panel_development/models/product_model.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/models/category_model.dart';
 import 'package:flutter_admin_panel_development/screens/user/category_product_screen.dart';
+import 'package:flutter_admin_panel_development/screens/user/product_detail_screen.dart';
 
 class UserHomeScreen extends StatelessWidget {
   const UserHomeScreen({super.key});
@@ -291,7 +292,15 @@ class UserHomeScreen extends StatelessWidget {
                                               width: double.infinity,
                                               child: ElevatedButton(
                                                 onPressed: () {
-                                                  // Add to cart logic
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (_) =>
+                                                          ProductDetailScreen(
+                                                            product: product,
+                                                          ),
+                                                    ),
+                                                  );
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                   padding:

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/models/product_model.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_admin_panel_development/screens/user/product_detail_screen.dart';
 
 class CategoryProductScreen extends StatelessWidget {
   final String categoryId;
@@ -104,7 +105,14 @@ class CategoryProductScreen extends StatelessWidget {
                                 width: double.infinity,
                                 child: ElevatedButton(
                                   onPressed: () {
-                                    // Add to cart logic here
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ProductDetailScreen(
+                                          product: product,
+                                        ),
+                                      ),
+                                    );
                                   },
                                   style: ElevatedButton.styleFrom(
                                     padding: const EdgeInsets.symmetric(
