@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/screens/user/my_orders_screen.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
@@ -68,13 +69,34 @@ class ProfileScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          user.displayName ??
-                              'User', // displayName might be null initially if not updated
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                        // Dynamic Name Display
+                        FutureBuilder<DocumentSnapshot>(
+                          future: FirebaseFirestore.instance
+                              .collection('users')
+                              .doc(user.uid)
+                              .get(),
+                          builder: (context, snapshot) {
+                            String displayName = user.displayName ?? 'User';
+
+                            if (snapshot.hasData &&
+                                snapshot.data != null &&
+                                snapshot.data!.exists) {
+                              final data =
+                                  snapshot.data!.data()
+                                      as Map<String, dynamic>?;
+                              if (data != null && data['name'] != null) {
+                                displayName = data['name'];
+                              }
+                            }
+
+                            return Text(
+                              displayName,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            );
+                          },
                         ),
                         Text(
                           user.email ?? '',
@@ -106,7 +128,6 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Shipping Addresses'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // TODO: Implement Address Management
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(const SnackBar(content: Text('Coming Soon')));
@@ -118,7 +139,6 @@ class ProfileScreen extends StatelessWidget {
               title: const Text('Settings'),
               trailing: const Icon(Icons.arrow_forward_ios, size: 16),
               onTap: () {
-                // TODO: Implement Address Management
                 ScaffoldMessenger.of(
                   context,
                 ).showSnackBar(const SnackBar(content: Text('Coming Soon')));
