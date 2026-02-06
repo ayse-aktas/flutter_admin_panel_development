@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/models/product_model.dart';
 import 'package:flutter_admin_panel_development/utils/theme.dart';
+import 'package:provider/provider.dart';
+import 'package:flutter_admin_panel_development/services/cart_service.dart';
 
 class ProductDetailScreen extends StatelessWidget {
   final ProductModel product;
@@ -155,9 +157,21 @@ class ProductDetailScreen extends StatelessWidget {
                   Expanded(
                     child: ElevatedButton(
                       onPressed: () {
-                        // TODO: Implement Add to Cart
+                        context.read<CartService>().addToCart(product);
                         ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(content: Text('Added to cart (Demo)')),
+                          SnackBar(
+                            content: Text('${product.name} added to cart'),
+                            action: SnackBarAction(
+                              label: 'View Cart',
+                              onPressed: () {
+                                // Since we are in a tab view, switching to cart tab is tricky without context of main screen
+                                // For now just pop if we want, or better:
+                                // Ideally we just let the user know.
+                                // Or we could navigate to CartScreen directly if it wasn't a tab.
+                                // Let's just show the message for now.
+                              },
+                            ),
+                          ),
                         );
                       },
                       style: ElevatedButton.styleFrom(

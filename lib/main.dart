@@ -4,6 +4,7 @@ import 'package:flutter_admin_panel_development/screens/user/user_main_screen.da
 import 'package:flutter_admin_panel_development/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
+import 'package:flutter_admin_panel_development/services/cart_service.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
 
 void main() async {
@@ -25,6 +26,7 @@ class MyApp extends StatelessWidget {
       providers: [
         Provider<AuthService>(create: (_) => AuthService()),
         Provider<DatabaseService>(create: (_) => DatabaseService()),
+        ChangeNotifierProvider<CartService>(create: (_) => CartService()),
       ],
       child: MaterialApp(
         title: 'Admin Panel',
