@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
 import 'package:flutter_admin_panel_development/models/product_model.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_admin_panel_development/models/category_model.dart';
+import 'package:flutter_admin_panel_development/screens/user/category_product_screen.dart';
 
 class UserHomeScreen extends StatelessWidget {
   const UserHomeScreen({super.key});
@@ -62,6 +64,122 @@ class UserHomeScreen extends StatelessWidget {
                             const SizedBox(height: 24),
                           ],
                         ),
+                      ),
+                    ),
+
+                    // Categories Section
+                    SliverToBoxAdapter(
+                      child: StreamBuilder<List<CategoryModel>>(
+                        stream: databaseService.getCategories(),
+                        builder: (context, snapshot) {
+                          if (snapshot.hasError || !snapshot.hasData) {
+                            return const SizedBox.shrink();
+                          }
+                          final categories = snapshot.data!;
+                          if (categories.isEmpty)
+                            return const SizedBox.shrink();
+
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 16.0),
+                                child: Text(
+                                  'Categories',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                              SizedBox(
+                                height: 100, // Reduced height for simple row
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: categories.length,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                  ),
+                                  itemBuilder: (context, index) {
+                                    final category = categories[index];
+                                    return GestureDetector(
+                                      onTap: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) =>
+                                                CategoryProductScreen(
+                                                  categoryId:
+                                                      category.categoryId,
+                                                  categoryName: category.name,
+                                                ),
+                                          ),
+                                        );
+                                      },
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          right: 16.0,
+                                        ),
+                                        child: Column(
+                                          children: [
+                                            Container(
+                                              width: 60,
+                                              height: 60,
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                    BorderRadius.circular(12),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withOpacity(0.05),
+                                                    blurRadius: 5,
+                                                    offset: const Offset(0, 2),
+                                                  ),
+                                                ],
+                                                image:
+                                                    category.imageUrl != null &&
+                                                        category
+                                                            .imageUrl!
+                                                            .isNotEmpty
+                                                    ? DecorationImage(
+                                                        image: NetworkImage(
+                                                          category.imageUrl!,
+                                                        ),
+                                                        fit: BoxFit.cover,
+                                                      )
+                                                    : null,
+                                              ),
+                                              child:
+                                                  category.imageUrl == null ||
+                                                      category.imageUrl!.isEmpty
+                                                  ? const Icon(
+                                                      Icons.category,
+                                                      color: Colors.grey,
+                                                    )
+                                                  : null,
+                                            ),
+                                            const SizedBox(height: 8),
+                                            Text(
+                                              category.name,
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                              ),
+                                              maxLines: 1,
+                                              overflow: TextOverflow.ellipsis,
+                                            ),
+                                          ],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 24),
+                            ],
+                          );
+                        },
                       ),
                     ),
 
