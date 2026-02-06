@@ -209,6 +209,37 @@ class DatabaseService {
     await batch.commit();
   }
 
+  Future<void> placeOrder(OrderModel order) async {
+    WriteBatch batch = _firestore.batch();
+    DocumentReference orderRef = _firestore
+        .collection('orders')
+        .doc(order.orderId);
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    // 1. Create Order
+    batch.set(orderRef, order.toMap());
+
+    // 2. Update Admin Stats (Pending Order)
+    batch.set(statsRef, {
+      'pendingOrder': FieldValue.increment(1),
+    }, SetOptions(merge: true));
+
+    // 3. Decrement Product Stock
+    for (var item in order.products) {
+      String productId = item['productId'];
+      int quantity = item['quantity'];
+
+      DocumentReference productRef = _firestore
+          .collection('products')
+          .doc(productId);
+      batch.update(productRef, {'stock': FieldValue.increment(-quantity)});
+    }
+
+    await batch.commit();
+  }
+
   // --- Admin Stats ---
   Stream<AdminStatsModel> getAdminStats() {
     return _firestore.collection('admin_stats').doc('stats').snapshots().map((
