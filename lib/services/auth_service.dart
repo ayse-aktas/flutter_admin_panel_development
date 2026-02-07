@@ -77,6 +77,16 @@ class AuthService {
     }
   }
 
+  // Get User Details
+  Stream<UserModel?> getUser(String uid) {
+    return _firestore.collection('users').doc(uid).snapshots().map((doc) {
+      if (doc.exists && doc.data() != null) {
+        return UserModel.fromMap(doc.data()!, doc.id);
+      }
+      return null;
+    });
+  }
+
   // Sign Out
   Future<void> signOut() async {
     await _auth.signOut();

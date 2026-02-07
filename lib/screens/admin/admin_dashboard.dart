@@ -6,6 +6,8 @@ import 'package:flutter_admin_panel_development/screens/admin/widgets/dashboard_
 import 'package:flutter_admin_panel_development/utils/constants.dart';
 import 'package:flutter_admin_panel_development/screens/admin/product_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/category_list_screen.dart';
+import 'package:flutter_admin_panel_development/services/auth_service.dart';
+import 'package:flutter_admin_panel_development/models/user_model.dart';
 import 'package:flutter_admin_panel_development/screens/admin/order_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/notification_screen.dart';
 
@@ -87,7 +89,62 @@ class _AdminDashboardState extends State<AdminDashboard> {
           return Padding(
             padding: const EdgeInsets.all(16.0),
             child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Profile Section
+                Consumer<AuthService>(
+                  builder: (context, authService, _) {
+                    final user = authService.currentUser;
+                    if (user == null) return const SizedBox.shrink();
+
+                    return StreamBuilder<UserModel?>(
+                      stream: authService.getUser(user.uid),
+                      builder: (context, snapshot) {
+                        if (!snapshot.hasData) return const SizedBox.shrink();
+                        final userModel = snapshot.data!;
+
+                        return Padding(
+                          padding: const EdgeInsets.only(bottom: 16.0),
+                          child: Row(
+                            children: [
+                              CircleAvatar(
+                                radius: 30,
+                                backgroundColor: Colors.red,
+                                child: Text(
+                                  userModel.name.isNotEmpty
+                                      ? userModel.name[0].toUpperCase()
+                                      : 'A',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(width: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    userModel.name,
+                                    style: const TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  Text(
+                                    userModel.email,
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        );
+                      },
+                    );
+                  },
+                ),
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
