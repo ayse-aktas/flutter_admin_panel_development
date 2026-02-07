@@ -3,6 +3,7 @@ import 'package:flutter_admin_panel_development/models/category_model.dart';
 import 'package:flutter_admin_panel_development/models/product_model.dart';
 import 'package:flutter_admin_panel_development/models/order_model.dart';
 import 'package:flutter_admin_panel_development/models/admin_stats_model.dart';
+import 'package:flutter_admin_panel_development/models/user_model.dart';
 
 class DatabaseService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -324,5 +325,33 @@ class DatabaseService {
       'status': 'pending',
       'createdAt': FieldValue.serverTimestamp(),
     });
+  }
+
+  // --- Users ---
+  Stream<List<UserModel>> getUsers() {
+    return _firestore
+        .collection('users')
+        .orderBy('createdAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+          return snapshot.docs
+              .map((doc) => UserModel.fromMap(doc.data(), doc.id))
+              .toList();
+        });
+  }
+
+  Future<void> deleteUser(String uid) async {
+    WriteBatch batch = _firestore.batch();
+    DocumentReference userRef = _firestore.collection('users').doc(uid);
+    DocumentReference statsRef = _firestore
+        .collection('admin_stats')
+        .doc('stats');
+
+    batch.delete(userRef);
+    batch.set(statsRef, {
+      'users': FieldValue.increment(-1),
+    }, SetOptions(merge: true));
+
+    await batch.commit();
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter_admin_panel_development/services/auth_service.dart';
 import 'package:flutter_admin_panel_development/models/user_model.dart';
 import 'package:flutter_admin_panel_development/screens/admin/order_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/notification_screen.dart';
+import 'package:flutter_admin_panel_development/screens/admin/user_list_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -268,7 +269,14 @@ class _AdminDashboardState extends State<AdminDashboard> {
                         value: stats.users.toString(),
                         icon: Icons.people,
                         color: Colors.brown,
-                        onTap: () {}, // TODO: Navigate to Users
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const UserListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
                     ],
                   ),
