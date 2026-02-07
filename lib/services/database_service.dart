@@ -354,4 +354,8 @@ class DatabaseService {
 
     await batch.commit();
   }
+
+  Future<void> updateUser(UserModel user) async {
+    await _firestore.collection('users').doc(user.uid).update(user.toMap());
+  }
 }

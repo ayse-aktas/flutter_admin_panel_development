@@ -50,10 +50,15 @@ class UserListScreen extends StatelessWidget {
                       CircleAvatar(
                         radius: 25,
                         backgroundColor: Colors.red,
-                        child: Icon(
-                          Icons.person,
-                          color: Colors.white,
-                          size: 30,
+                        child: Text(
+                          user.name.isNotEmpty
+                              ? user.name[0].toUpperCase()
+                              : 'A',
+                          style: const TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
                         ),
                       ),
                       const SizedBox(width: 16),
@@ -75,13 +80,19 @@ class UserListScreen extends StatelessWidget {
                                 fontSize: 14,
                               ),
                             ),
+                            Text(
+                              'Role: ${user.role}',
+                              style: TextStyle(
+                                color: Colors.blue[600],
+                                fontSize: 12,
+                              ),
+                            ),
                           ],
                         ),
                       ),
                       IconButton(
                         icon: const Icon(Icons.delete, color: Colors.red),
                         onPressed: () async {
-                          // Suggest using a dialog for confirmation
                           final confirm = await showDialog<bool>(
                             context: context,
                             builder: (context) => AlertDialog(
@@ -121,11 +132,9 @@ class UserListScreen extends StatelessWidget {
                       IconButton(
                         icon: const Icon(Icons.edit, color: Colors.black),
                         onPressed: () {
-                          // Edit functionality to be implemented
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('Edit feature coming soon'),
-                            ),
+                          showDialog(
+                            context: context,
+                            builder: (context) => _EditUserDialog(user: user),
                           );
                         },
                       ),
@@ -137,6 +146,106 @@ class UserListScreen extends StatelessWidget {
           );
         },
       ),
+    );
+  }
+}
+
+class _EditUserDialog extends StatefulWidget {
+  final UserModel user;
+
+  const _EditUserDialog({required this.user});
+
+  @override
+  State<_EditUserDialog> createState() => _EditUserDialogState();
+}
+
+class _EditUserDialogState extends State<_EditUserDialog> {
+  late TextEditingController _nameController;
+  late TextEditingController _emailController;
+  String _role = 'user';
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController(text: widget.user.name);
+    _emailController = TextEditingController(text: widget.user.email);
+    _role = widget.user.role;
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _emailController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      title: const Text('Edit User'),
+      content: SingleChildScrollView(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Name'),
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _emailController,
+              decoration: const InputDecoration(labelText: 'Email'),
+              enabled: false, // Email is typically not editable directly
+            ),
+            const SizedBox(height: 12),
+            DropdownButtonFormField<String>(
+              value: _role,
+              decoration: const InputDecoration(labelText: 'Role'),
+              items: const [
+                DropdownMenuItem(value: 'user', child: Text('User')),
+                DropdownMenuItem(value: 'admin', child: Text('Admin')),
+              ],
+              onChanged: (value) {
+                setState(() {
+                  _role = value!;
+                });
+              },
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text('Cancel'),
+        ),
+        ElevatedButton(
+          onPressed: () async {
+            final databaseService = Provider.of<DatabaseService>(
+              context,
+              listen: false,
+            );
+
+            final updatedUser = UserModel(
+              uid: widget.user.uid,
+              name: _nameController.text.trim(),
+              email: widget.user.email,
+              role: _role,
+              createdAt: widget.user.createdAt,
+            );
+
+            await databaseService.updateUser(updatedUser);
+
+            if (context.mounted) {
+              Navigator.pop(context);
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(content: Text('User updated successfully')),
+              );
+            }
+          },
+          child: const Text('Save'),
+        ),
+      ],
     );
   }
 }
