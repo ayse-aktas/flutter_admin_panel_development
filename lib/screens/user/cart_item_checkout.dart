@@ -195,10 +195,6 @@ class _CartItemCheckoutState extends State<CartItemCheckout> {
             ],
           ),
         );
-
-        if (mounted) {
-          Navigator.pop(context); // Pop Checkout Screen
-        }
       }
     } catch (e) {
       if (mounted) {

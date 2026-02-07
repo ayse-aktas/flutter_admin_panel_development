@@ -115,38 +115,82 @@ class OrderListScreen extends StatelessWidget {
                         ),
                       ),
                       const Divider(),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _ActionChip(
-                            label: 'Delivery',
-                            color: Colors.blue,
-                            onTap: () => databaseService.updateOrderStatus(
-                              order.orderId,
-                              'delivery',
-                              order,
+                      const Divider(),
+                      if (order.status == 'pending')
+                        Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  databaseService.updateOrderStatus(
+                                    order.orderId,
+                                    'delivery',
+                                    order,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text('Send to Delivery'),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  databaseService.updateOrderStatus(
+                                    order.orderId,
+                                    'cancelled',
+                                    order,
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text('Cancel Order'),
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: _getStatusColor(
+                              order.status,
+                            ).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(8),
+                            border: Border.all(
+                              color: _getStatusColor(order.status),
                             ),
                           ),
-                          _ActionChip(
-                            label: 'Complete',
-                            color: Colors.green,
-                            onTap: () => databaseService.updateOrderStatus(
-                              order.orderId,
-                              'completed',
-                              order,
+                          child: Center(
+                            child: Text(
+                              'Order Status: ${order.status.toUpperCase()}',
+                              style: TextStyle(
+                                color: _getStatusColor(order.status),
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                          _ActionChip(
-                            label: 'Cancel',
-                            color: Colors.red,
-                            onTap: () => databaseService.updateOrderStatus(
-                              order.orderId,
-                              'cancelled',
-                              order,
-                            ),
-                          ),
-                        ],
-                      ),
+                        ),
                     ],
                   ),
                 ),
@@ -154,36 +198,6 @@ class OrderListScreen extends StatelessWidget {
             },
           );
         },
-      ),
-    );
-  }
-}
-
-class _ActionChip extends StatelessWidget {
-  final String label;
-  final Color color;
-  final VoidCallback onTap;
-
-  const _ActionChip({
-    required this.label,
-    required this.color,
-    required this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(color: color, fontWeight: FontWeight.bold),
-        ),
       ),
     );
   }

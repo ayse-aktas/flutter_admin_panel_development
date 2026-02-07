@@ -3,7 +3,6 @@ import 'package:flutter_admin_panel_development/models/order_model.dart';
 import 'package:flutter_admin_panel_development/services/auth_service.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 
 class MyOrdersScreen extends StatelessWidget {
   const MyOrdersScreen({super.key});
@@ -57,51 +56,189 @@ class MyOrdersScreen extends StatelessWidget {
               final order = orders[index];
               return Card(
                 margin: const EdgeInsets.only(bottom: 16),
-                child: ExpansionTile(
-                  title: Text(
-                    'Order #${order.orderId.substring(0, 8)}',
-                    style: const TextStyle(fontWeight: FontWeight.bold),
-                  ),
-                  subtitle: Text(
-                    '${DateFormat('dd MMM yyyy').format(order.createdAt)} • ${order.status.toUpperCase()}',
-                    style: TextStyle(
-                      color: order.status == 'pending'
-                          ? Colors.orange
-                          : Colors.green,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  trailing: Text('\$${order.totalPrice.toStringAsFixed(2)}'),
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.all(16.0),
-                      child: Column(
+                child: Padding(
+                  padding: const EdgeInsets.all(12.0),
+                  child: Column(
+                    children: [
+                      Row(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const Text(
-                            'Items:',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                          // Product Image (First item)
+                          Container(
+                            width: 100,
+                            height: 100,
+                            color: Colors.red.withOpacity(0.1),
+                            child:
+                                order.products.isNotEmpty &&
+                                    order.products.first['imageUrl'] != null &&
+                                    order.products.first['imageUrl']
+                                        .toString()
+                                        .isNotEmpty
+                                ? Image.network(
+                                    order.products.first['imageUrl'],
+                                    fit: BoxFit.cover,
+                                  )
+                                : const Icon(Icons.image, size: 50),
                           ),
-                          const SizedBox(height: 8),
-                          ...order.products.map(
-                            (item) => Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 4.0,
-                              ),
-                              child: Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('${item['quantity']}x ${item['name']}'),
-                                  Text('\$${item['price']}'),
-                                ],
-                              ),
+                          const SizedBox(width: 12),
+                          // Details
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  order.products.isNotEmpty
+                                      ? order.products.first['name']
+                                      : 'Order #${order.orderId}',
+                                  style: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    fontSize: 16,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Quantity: ${order.products.fold<int>(0, (sum, item) => sum + (item['quantity'] as int))}',
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Total Price: \$${order.totalPrice.toStringAsFixed(1)}',
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  'Order Status: ${order.status[0].toUpperCase()}${order.status.substring(1)}',
+                                  style: TextStyle(
+                                    color: Colors.grey[800],
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
+                          ),
+                          // Dropdown icon
+                          const Icon(
+                            Icons.keyboard_arrow_down,
+                            color: Colors.grey,
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 12),
+                      // Actions
+                      if (order.status == 'pending')
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: () {
+                              context.read<DatabaseService>().updateOrderStatus(
+                                order.orderId,
+                                'cancelled',
+                                order,
+                              );
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.red,
+                              foregroundColor: Colors.white,
+                              padding: const EdgeInsets.symmetric(vertical: 12),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: const Text('Cancel Order'),
+                          ),
+                        ),
+                      if (order.status == 'delivery')
+                        Column(
+                          children: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context
+                                      .read<DatabaseService>()
+                                      .updateOrderStatus(
+                                        order.orderId,
+                                        'cancelled',
+                                        order,
+                                      );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text('Cancel Order'),
+                              ),
+                            ),
+                            const SizedBox(height: 8),
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: () {
+                                  context
+                                      .read<DatabaseService>()
+                                      .updateOrderStatus(
+                                        order.orderId,
+                                        'completed',
+                                        order,
+                                      );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.red,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 12,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: const Text('Delivered Order'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      if (order.status == 'cancelled')
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.red.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Order Cancelled',
+                              style: TextStyle(
+                                color: Colors.red,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      if (order.status == 'completed')
+                        Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(8),
+                          decoration: BoxDecoration(
+                            color: Colors.green.withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Center(
+                            child: Text(
+                              'Order Completed',
+                              style: TextStyle(
+                                color: Colors.green,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                    ],
+                  ),
                 ),
               );
             },
