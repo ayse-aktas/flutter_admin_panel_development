@@ -196,7 +196,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const OrderListScreen(),
+                              builder: (_) =>
+                                  const OrderListScreen(status: 'pending'),
                             ),
                           ).then((_) => _initStats());
                         },
@@ -210,7 +211,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const OrderListScreen(),
+                              builder: (_) =>
+                                  const OrderListScreen(status: 'delivery'),
                             ),
                           ).then((_) => _initStats());
                         },
@@ -224,7 +226,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const OrderListScreen(),
+                              builder: (_) =>
+                                  const OrderListScreen(status: 'cancelled'),
                             ),
                           ).then((_) => _initStats());
                         },
@@ -238,7 +241,8 @@ class _AdminDashboardState extends State<AdminDashboard> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (_) => const OrderListScreen(),
+                              builder: (_) =>
+                                  const OrderListScreen(status: 'completed'),
                             ),
                           ).then((_) => _initStats());
                         },

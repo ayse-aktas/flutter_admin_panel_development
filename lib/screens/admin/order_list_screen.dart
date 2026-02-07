@@ -5,7 +5,9 @@ import 'package:flutter_admin_panel_development/models/order_model.dart';
 import 'package:intl/intl.dart';
 
 class OrderListScreen extends StatelessWidget {
-  const OrderListScreen({super.key});
+  final String? status;
+
+  const OrderListScreen({super.key, this.status});
 
   Color _getStatusColor(String status) {
     switch (status) {
@@ -25,11 +27,14 @@ class OrderListScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final databaseService = Provider.of<DatabaseService>(context);
+    final title = status != null
+        ? '${status![0].toUpperCase()}${status!.substring(1)} Orders'
+        : 'All Orders';
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Orders')),
+      appBar: AppBar(title: Text(title)),
       body: StreamBuilder<List<OrderModel>>(
-        stream: databaseService.getOrders(),
+        stream: databaseService.getOrders(status: status),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
