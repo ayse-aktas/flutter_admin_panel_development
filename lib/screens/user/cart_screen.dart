@@ -1,10 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_admin_panel_development/services/cart_service.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_admin_panel_development/models/order_model.dart';
-import 'package:flutter_admin_panel_development/services/auth_service.dart';
-import 'package:flutter_admin_panel_development/services/database_service.dart';
-import 'package:uuid/uuid.dart';
+import 'package:flutter_admin_panel_development/screens/user/cart_item_checkout.dart';
 
 class CartScreen extends StatelessWidget {
   const CartScreen({super.key});
@@ -162,98 +159,25 @@ class CartScreen extends StatelessWidget {
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
-                          onPressed: () async {
-                            final cartService = context.read<CartService>();
-                            final databaseService = context
-                                .read<DatabaseService>();
-                            final authService = context.read<AuthService>();
-                            final user = authService.currentUser;
-
-                            // For testing, we allow guests.
-                            // In real app we might force login.
-                            final userId =
-                                user?.uid ??
-                                'guest_${const Uuid().v4().substring(0, 8)}';
-                            final userName = user?.displayName ?? 'Guest User';
-
-                            // Show loading
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (_) => const Center(
-                                child: CircularProgressIndicator(),
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (_) => const CartItemCheckout(),
                               ),
                             );
-
-                            try {
-                              final orderId = const Uuid().v4();
-
-                              // Create Order Object
-                              final order = OrderModel(
-                                orderId: orderId,
-                                userId: userId,
-                                userName: userName,
-                                products: cartService.items
-                                    .map(
-                                      (item) => {
-                                        'productId': item.product.productId,
-                                        'name': item.product.name,
-                                        'quantity': item.quantity,
-                                        'price': item.product.price,
-                                        'imageUrl': item.product.imageUrl,
-                                      },
-                                    )
-                                    .toList(),
-                                totalPrice: cartService.totalAmount,
-                                paymentMethod: 'Credit Card', // Mock
-                                status: 'pending',
-                                createdAt: DateTime.now(),
-                              );
-
-                              // Save to DB
-                              await databaseService.placeOrder(order);
-
-                              // Clear Cart
-                              cartService.clearCart();
-
-                              if (context.mounted) {
-                                Navigator.pop(context); // Close loading
-
-                                // Show Success and go back
-                                showDialog(
-                                  context: context,
-                                  builder: (_) => AlertDialog(
-                                    title: const Text('Success!'),
-                                    content: const Text(
-                                      'Your order has been placed successfully.',
-                                    ),
-                                    actions: [
-                                      TextButton(
-                                        onPressed: () {
-                                          Navigator.pop(context); // Close alert
-                                          // Optionally navigate to Orders tab if we had one
-                                        },
-                                        child: const Text('OK'),
-                                      ),
-                                    ],
-                                  ),
-                                );
-                              }
-                            } catch (e) {
-                              if (context.mounted) {
-                                Navigator.pop(context); // Close loading
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text('Order failed: $e')),
-                                );
-                              }
-                            }
                           },
                           style: ElevatedButton.styleFrom(
                             padding: const EdgeInsets.symmetric(vertical: 16),
+                            backgroundColor: Colors.red,
+                            foregroundColor: Colors.white,
                           ),
                           child: const Text(
                             'Checkout',
-                            style: TextStyle(fontSize: 16),
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),

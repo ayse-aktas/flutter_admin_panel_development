@@ -64,6 +64,13 @@ class _AdminDashboardState extends State<AdminDashboard> {
               }
             },
           ),
+          IconButton(
+            icon: const Icon(Icons.logout),
+            tooltip: 'Logout',
+            onPressed: () async {
+              await context.read<AuthService>().signOut();
+            },
+          ),
         ],
       ),
       body: StreamBuilder<AdminStatsModel>(
