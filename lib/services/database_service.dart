@@ -315,4 +315,14 @@ class DatabaseService {
       'earning': totalEarning,
     });
   }
+
+  // --- Notifications ---
+  Future<void> sendBroadcastNotification(String title, String body) async {
+    await _firestore.collection('broadcast_notifications').add({
+      'title': title,
+      'body': body,
+      'status': 'pending',
+      'createdAt': FieldValue.serverTimestamp(),
+    });
+  }
 }

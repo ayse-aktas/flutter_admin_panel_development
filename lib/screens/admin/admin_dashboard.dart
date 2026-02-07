@@ -7,6 +7,7 @@ import 'package:flutter_admin_panel_development/utils/constants.dart';
 import 'package:flutter_admin_panel_development/screens/admin/product_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/category_list_screen.dart';
 import 'package:flutter_admin_panel_development/screens/admin/order_list_screen.dart';
+import 'package:flutter_admin_panel_development/screens/admin/notification_screen.dart';
 
 class AdminDashboard extends StatefulWidget {
   const AdminDashboard({super.key});
@@ -85,109 +86,135 @@ class _AdminDashboardState extends State<AdminDashboard> {
 
           return Padding(
             padding: const EdgeInsets.all(16.0),
-            child: GridView.count(
-              crossAxisCount: 2,
-              crossAxisSpacing: 16,
-              mainAxisSpacing: 16,
+            child: Column(
               children: [
-                DashboardCard(
-                  title: 'Total Earning',
-                  value:
-                      '${AppConstants.currencySymbol}${stats.earning.toStringAsFixed(2)}',
-                  icon: Icons.attach_money,
-                  color: Colors.green.shade700,
-                  onTap: () {},
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationScreen(),
+                        ),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text('Send Notification to all users'),
+                  ),
                 ),
-                DashboardCard(
-                  title: 'Pending Orders',
-                  value: stats.pendingOrder.toString(),
-                  icon: Icons.pending_actions,
-                  color: Colors.orange,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OrderListScreen(),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: GridView.count(
+                    crossAxisCount: 2,
+                    crossAxisSpacing: 16,
+                    mainAxisSpacing: 16,
+                    children: [
+                      DashboardCard(
+                        title: 'Total Earning',
+                        value:
+                            '${AppConstants.currencySymbol}${stats.earning.toStringAsFixed(2)}',
+                        icon: Icons.attach_money,
+                        color: Colors.green.shade700,
+                        onTap: () {},
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Delivery Orders',
-                  value: stats.deliveryOrder.toString(),
-                  icon: Icons.local_shipping,
-                  color: Colors.blue,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OrderListScreen(),
+                      DashboardCard(
+                        title: 'Pending Orders',
+                        value: stats.pendingOrder.toString(),
+                        icon: Icons.pending_actions,
+                        color: Colors.orange,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OrderListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Cancelled Orders',
-                  value: stats.cancelOrder.toString(),
-                  icon: Icons.cancel,
-                  color: Colors.red,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OrderListScreen(),
+                      DashboardCard(
+                        title: 'Delivery Orders',
+                        value: stats.deliveryOrder.toString(),
+                        icon: Icons.local_shipping,
+                        color: Colors.blue,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OrderListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Completed Orders',
-                  value: stats.completedOrder.toString(),
-                  icon: Icons.check_circle,
-                  color: Colors.teal,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const OrderListScreen(),
+                      DashboardCard(
+                        title: 'Cancelled Orders',
+                        value: stats.cancelOrder.toString(),
+                        icon: Icons.cancel,
+                        color: Colors.red,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OrderListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Products',
-                  value: stats.products.toString(),
-                  icon: Icons.inventory_2,
-                  color: Colors.purple,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const ProductListScreen(),
+                      DashboardCard(
+                        title: 'Completed Orders',
+                        value: stats.completedOrder.toString(),
+                        icon: Icons.check_circle,
+                        color: Colors.teal,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const OrderListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Categories',
-                  value: stats.categories.toString(),
-                  icon: Icons.category,
-                  color: Colors.indigo,
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const CategoryListScreen(),
+                      DashboardCard(
+                        title: 'Products',
+                        value: stats.products.toString(),
+                        icon: Icons.inventory_2,
+                        color: Colors.purple,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const ProductListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
                       ),
-                    ).then((_) => _initStats());
-                  },
-                ),
-                DashboardCard(
-                  title: 'Users',
-                  value: stats.users.toString(),
-                  icon: Icons.people,
-                  color: Colors.brown,
-                  onTap: () {}, // TODO: Navigate to Users
+                      DashboardCard(
+                        title: 'Categories',
+                        value: stats.categories.toString(),
+                        icon: Icons.category,
+                        color: Colors.indigo,
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => const CategoryListScreen(),
+                            ),
+                          ).then((_) => _initStats());
+                        },
+                      ),
+                      DashboardCard(
+                        title: 'Users',
+                        value: stats.users.toString(),
+                        icon: Icons.people,
+                        color: Colors.brown,
+                        onTap: () {}, // TODO: Navigate to Users
+                      ),
+                    ],
+                  ),
                 ),
               ],
             ),
