@@ -4,10 +4,31 @@ import 'package:flutter_admin_panel_development/utils/theme.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_admin_panel_development/services/cart_service.dart';
 
-class ProductDetailScreen extends StatelessWidget {
+class ProductDetailScreen extends StatefulWidget {
   final ProductModel product;
 
   const ProductDetailScreen({super.key, required this.product});
+
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
+  int _quantity = 1;
+
+  void _incrementQuantity() {
+    setState(() {
+      _quantity++;
+    });
+  }
+
+  void _decrementQuantity() {
+    if (_quantity > 1) {
+      setState(() {
+        _quantity--;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,9 +60,9 @@ class ProductDetailScreen extends StatelessWidget {
                       ),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(16),
-                        child: product.imageUrl.isNotEmpty
+                        child: widget.product.imageUrl.isNotEmpty
                             ? Image.network(
-                                product.imageUrl,
+                                widget.product.imageUrl,
                                 fit: BoxFit.contain,
                                 errorBuilder: (context, error, stackTrace) =>
                                     const Icon(Icons.broken_image, size: 100),
@@ -59,7 +80,7 @@ class ProductDetailScreen extends StatelessWidget {
                     children: [
                       Expanded(
                         child: Text(
-                          product.name,
+                          widget.product.name,
                           style: const TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -67,7 +88,7 @@ class ProductDetailScreen extends StatelessWidget {
                         ),
                       ),
                       Text(
-                        '\$${product.price.toStringAsFixed(2)}',
+                        '\$${widget.product.price.toStringAsFixed(2)}',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -87,9 +108,9 @@ class ProductDetailScreen extends StatelessWidget {
 
                   // Description Text
                   Text(
-                    product.description.isEmpty
+                    widget.product.description.isEmpty
                         ? 'No description available.'
-                        : product.description,
+                        : widget.product.description,
                     style: TextStyle(
                       fontSize: 14,
                       color: Colors.grey[600],
@@ -118,11 +139,9 @@ class ProductDetailScreen extends StatelessWidget {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  // Quantity and Price Row could go here if needed, but keeping simple for now
-                  const SizedBox(height: 8),
+                  // Quantity Selector
                   Row(
                     children: [
-                      // Quantity Selector
                       Container(
                         decoration: BoxDecoration(
                           border: Border.all(color: Colors.grey.shade300),
@@ -132,23 +151,22 @@ class ProductDetailScreen extends StatelessWidget {
                           children: [
                             IconButton(
                               icon: const Icon(Icons.remove),
-                              onPressed:
-                                  () {}, // TODO: Implement quantity logic in state if needed
+                              onPressed: _decrementQuantity,
                               constraints: const BoxConstraints(
                                 minWidth: 40,
                                 minHeight: 40,
                               ),
                             ),
-                            const Text(
-                              '1',
-                              style: TextStyle(
+                            Text(
+                              '$_quantity',
+                              style: const TextStyle(
                                 fontSize: 16,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             IconButton(
                               icon: const Icon(Icons.add),
-                              onPressed: () {},
+                              onPressed: _incrementQuantity,
                               constraints: const BoxConstraints(
                                 minWidth: 40,
                                 minHeight: 40,
@@ -167,7 +185,10 @@ class ProductDetailScreen extends StatelessWidget {
                       Expanded(
                         child: OutlinedButton(
                           onPressed: () {
-                            context.read<CartService>().addToCart(product);
+                            context.read<CartService>().addToCart(
+                              widget.product,
+                              quantity: _quantity,
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Added to Cart'),
@@ -195,28 +216,10 @@ class ProductDetailScreen extends StatelessWidget {
                       Expanded(
                         child: ElevatedButton(
                           onPressed: () {
-                            // Add to cart and navigate to cart
-                            context.read<CartService>().addToCart(product);
-                            // Assuming we are in a tab view, we can't easily switch tabs without access to the TabController.
-                            // But usually "Buy" implies going to checkout.
-                            // If we can't switch tabs, we can push the CartScreen.
-                            // However, CartScreen is likely a root tab.
-                            // For now, let's just show a snackbar and maybe user navigates manually?
-                            // OR, we push a new CartScreen instance (might be confusing with tabs).
-
-                            // Better approach for "Buy":
-                            // context.read<CartService>().addToCart(product);
-                            // Navigator.of(context).push(MaterialPageRoute(builder: (_) => const CartScreen()));
-                            // But CartScreen is designed as a tab.
-
-                            // Let's check user_main_screen.dart to see how navigation is handled.
-                            // If it uses a BottomNavigationBar, we might need to access the provider or state to switch index.
-
-                            // Let's assume for now we just add to cart.
-                            // Wait, user explicitly asked for flow: "add to cart derse : sepete eklensin ... checkout desin sonra chart ıtem chechout kısmına geçsin"
-                            // So "Buy" logic isn't fully detailed but implied.
-                            // I will just implement the buttons for now.
-
+                            context.read<CartService>().addToCart(
+                              widget.product,
+                              quantity: _quantity,
+                            );
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text(
