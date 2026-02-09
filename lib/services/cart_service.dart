@@ -15,11 +15,20 @@ class CartService extends ChangeNotifier {
     return _items.length;
   }
 
-  void addToCart(ProductModel product, {int quantity = 1}) {
+  bool addToCart(ProductModel product, {int quantity = 1}) {
     // Check if product is already in cart
     final existingIndex = _items.indexWhere(
       (item) => item.product.productId == product.productId,
     );
+
+    int currentQuantityInCart = 0;
+    if (existingIndex >= 0) {
+      currentQuantityInCart = _items[existingIndex].quantity;
+    }
+
+    if (currentQuantityInCart + quantity > product.stock) {
+      return false; // Not enough stock
+    }
 
     if (existingIndex >= 0) {
       _items[existingIndex].quantity += quantity;
@@ -27,6 +36,7 @@ class CartService extends ChangeNotifier {
       _items.add(CartItemModel(product: product, quantity: quantity));
     }
     notifyListeners();
+    return true;
   }
 
   void removeFromCart(String productId) {
