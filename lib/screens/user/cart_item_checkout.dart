@@ -111,8 +111,23 @@ class _CartItemCheckoutState extends State<CartItemCheckout> {
     final user = authService.currentUser;
 
     // For testing/guest support
-    final userId = user?.uid ?? 'guest_${const Uuid().v4().substring(0, 8)}';
-    final userName = user?.displayName ?? 'Guest User';
+    String userId = 'guest_${const Uuid().v4().substring(0, 8)}';
+    String userName = 'Guest User';
+
+    if (user != null) {
+      userId = user.uid;
+      try {
+        final userModel = await authService.getUser(user.uid).first;
+        if (userModel != null && userModel.name.isNotEmpty) {
+          userName = userModel.name;
+        } else {
+          userName = user.displayName ?? 'Guest User';
+        }
+      } catch (e) {
+        debugPrint('Error fetching user data: $e');
+        userName = user.displayName ?? 'Guest User';
+      }
+    }
 
     // Show loading
     showDialog(
