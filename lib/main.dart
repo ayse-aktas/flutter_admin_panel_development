@@ -8,9 +8,12 @@ import 'package:flutter_admin_panel_development/services/cart_service.dart';
 import 'package:flutter_admin_panel_development/services/database_service.dart';
 import 'package:flutter_admin_panel_development/services/storage_service.dart';
 
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   try {
+    await dotenv.load(fileName: ".env");
     await Firebase.initializeApp();
   } catch (e) {
     debugPrint('FIREBASE INIT ERROR: $e');
